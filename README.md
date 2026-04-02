@@ -1,73 +1,36 @@
 # 🖋️ Inkwell — منصة التدوين
 
-منصة تدوين عربية متعددة المستخدمين مع استيراد مستندات Word مباشرة.
-
-## 🚀 تشغيل المنصة
+## 🚀 تشغيل محلي
 
 ```bash
-# 1. تثبيت المكتبات
 npm install
-
-# 2. تشغيل الخادم
 npm start
-
-# 3. افتح المتصفح على
-http://localhost:3000
 ```
 
-## ✨ المميزات
+## ☁️ النشر على Render
 
-- **رفع مستند Word (.docx)** → يُحوَّل تلقائياً مع الحفاظ على التنسيق
-- **قراءة مقسمة على صفحات** للمقالات الطويلة (+1500 كلمة)
-- **دعم كامل للعربية والإنجليزية** (RTL + LTR)
-- **لوحة تحكم** مع إحصائيات المشاهدات
-- **مدونة خاصة** لكل كاتب على رابط مميز
-- **تسجيل دخول آمن** مع JWT
+### 1. قاعدة البيانات (PostgreSQL)
+- في Render → **New** → **PostgreSQL**
+- سمّها `inkwell-db`
+- انسخ الـ **Internal Database URL**
 
-## 📁 هيكل المشروع
+### 2. خدمة الصور (Cloudinary)
+- سجّل على [cloudinary.com](https://cloudinary.com) (مجاني)
+- من Dashboard انسخ: Cloud Name, API Key, API Secret
+
+### 3. Web Service
+- في Render → **New** → **Web Service** → اربط بـ GitHub repo
+- **Build Command:** `npm install`
+- **Start Command:** `node server.js`
+
+### 4. متغيرات البيئة (Environment Variables)
+أضف هذه في Render → Environment:
 
 ```
-inkwell/
-├── server.js          ← الخادم الرئيسي (Express API)
-├── db.json            ← قاعدة البيانات (تُنشأ تلقائياً)
-├── uploads/           ← صور الغلاف
-└── public/
-    └── index.html     ← الواجهة الأمامية (React SPA)
+DATABASE_URL          = (Internal URL من قاعدة البيانات)
+JWT_SECRET            = (نص سري طويل عشوائي)
+CLOUDINARY_CLOUD_NAME = (من Cloudinary Dashboard)
+CLOUDINARY_API_KEY    = (من Cloudinary Dashboard)
+CLOUDINARY_API_SECRET = (من Cloudinary Dashboard)
+NODE_ENV              = production
 ```
-
-## 🔌 API Endpoints
-
-### Auth
-- `POST /api/auth/register` — تسجيل حساب جديد
-- `POST /api/auth/login` — تسجيل الدخول
-- `PUT /api/auth/profile` — تحديث الملف الشخصي
-
-### Articles
-- `POST /api/articles/parse` — رفع وتحليل ملف .docx
-- `POST /api/articles/cover` — رفع صورة الغلاف
-- `GET /api/articles` — قائمة المقالات (الرئيسية)
-- `GET /api/articles/:id` — مقال واحد
-- `POST /api/articles` — نشر مقال جديد
-- `PUT /api/articles/:id` — تعديل مقال
-- `DELETE /api/articles/:id` — حذف مقال
-- `POST /api/articles/:id/view` — تسجيل مشاهدة
-
-### Users
-- `GET /api/users/:username` — صفحة الكاتب ومقالاته
-- `GET /api/dashboard` — لوحة التحكم + الإحصائيات
-
-## ⚙️ متغيرات البيئة
-
-```env
-PORT=3000              # رقم المنفذ (افتراضي: 3000)
-JWT_SECRET=your-secret # مفتاح JWT (يُنصح بتغييره في الإنتاج)
-```
-
-## 🔜 تطوير مستقبلي
-
-- [ ] بحث في المقالات
-- [ ] نظام تعليقات
-- [ ] متابعة الكتّاب
-- [ ] إشعارات البريد الإلكتروني
-- [ ] نظام دفع / اشتراكات
-- [ ] تصدير المقالات إلى PDF
