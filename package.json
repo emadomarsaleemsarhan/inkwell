@@ -1,14 +1,11 @@
 {
   "name": "inkwell",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Arabic blogging platform with Word import",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
