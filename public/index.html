@@ -1,0 +1,1015 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inkwell · منصة التدوين</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cairo:wght@300;400;500;600;700&family=Noto+Serif+Arabic:wght@300;400;500;600&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+  :root {
+    --orange: #E8500A; --orange-light: #FF6B2B;
+    --orange-pale: #FFF3EE; --orange-muted: #FDEBD0;
+    --bg: #FAFAF8; --bg-white: #FFFFFF;
+    --ink: #1A1A1A; --ink-mid: #4A4A4A; --ink-soft: #8A8A8A; --ink-pale: #C8C8C8;
+    --border: #EBEBEB; --border-strong: #D0D0D0;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 20px rgba(0,0,0,0.08);
+    --shadow-lg: 0 8px 40px rgba(0,0,0,0.12);
+    --r: 10px;
+    --ff-display-ar: 'Playfair Display','Noto Serif Arabic',serif;
+    --ff-body-ar: 'Noto Serif Arabic','Cairo',serif;
+    --ff-ui-ar: 'Cairo',sans-serif;
+    --ff-display-en: 'Playfair Display',Georgia,serif;
+    --ff-body-en: 'DM Sans',Georgia,serif;
+    --ff-ui-en: 'DM Sans',sans-serif;
+    --ff-display: var(--ff-display-ar);
+    --ff-body: var(--ff-body-ar);
+    --ff-ui: var(--ff-ui-ar);
+  }
+  html[lang="en"] { --ff-display:var(--ff-display-en); --ff-body:var(--ff-body-en); --ff-ui:var(--ff-ui-en); }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--ff-ui);background:var(--bg);color:var(--ink);line-height:1.7;-webkit-font-smoothing:antialiased}
+  ::-webkit-scrollbar{width:6px}::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--orange-pale);border-radius:3px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--orange)}
+
+  .btn{display:inline-flex;align-items:center;gap:6px;padding:10px 22px;border-radius:50px;border:none;cursor:pointer;font-family:var(--ff-ui);font-size:14px;font-weight:500;transition:all .2s;text-decoration:none;white-space:nowrap}
+  .btn-primary{background:var(--orange);color:#fff}
+  .btn-primary:hover{background:var(--orange-light);transform:translateY(-1px);box-shadow:0 4px 14px rgba(232,80,10,.3)}
+  .btn-outline{background:transparent;color:var(--orange);border:1.5px solid var(--orange)}
+  .btn-outline:hover{background:var(--orange-pale)}
+  .btn-ghost{background:transparent;color:var(--ink-mid);border:1.5px solid var(--border-strong)}
+  .btn-ghost:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-pale)}
+  .btn-sm{padding:7px 16px;font-size:13px}
+
+  .lang-btn{display:inline-flex;align-items:center;gap:5px;padding:6px 13px;border-radius:50px;border:1.5px solid var(--border-strong);background:transparent;cursor:pointer;font-size:13px;font-weight:600;color:var(--ink-mid);font-family:var(--ff-ui-en);transition:all .2s;letter-spacing:.3px}
+  .lang-btn:hover{border-color:var(--orange);color:var(--orange);background:var(--orange-pale)}
+
+  input,textarea,select{font-family:var(--ff-ui);width:100%;padding:11px 16px;border:1.5px solid var(--border-strong);border-radius:var(--r);background:var(--bg-white);color:var(--ink);font-size:15px;transition:border-color .2s,box-shadow .2s;outline:none}
+  input:focus,textarea:focus,select:focus{border-color:var(--orange);box-shadow:0 0 0 3px rgba(232,80,10,.1)}
+  textarea{resize:vertical;min-height:80px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--ink-mid);margin-bottom:6px}
+
+  .tag{display:inline-block;padding:3px 12px;border-radius:50px;font-size:12px;font-weight:500;background:var(--orange-pale);color:var(--orange);text-decoration:none;transition:background .15s}
+  .tag:hover{background:var(--orange-muted)}
+
+  .spinner{width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite;display:inline-block}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .fade-in{animation:fadeIn .4s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+
+  nav{position:sticky;top:0;z-index:100;background:rgba(250,250,248,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center}
+  .nav-inner{max-width:1200px;width:100%;margin:0 auto;padding:0 24px;display:flex;align-items:center;justify-content:space-between}
+  .nav-logo{font-family:var(--ff-display-en);font-size:22px;color:var(--ink);text-decoration:none;display:flex;align-items:center;gap:8px}
+  .nav-logo .dot{display:inline-block;width:8px;height:8px;background:var(--orange);border-radius:50%;margin-bottom:2px}
+  .nav-links{display:flex;align-items:center;gap:8px}
+  .nav-avatar{width:36px;height:36px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;cursor:pointer;text-decoration:none;transition:transform .2s;font-family:var(--ff-ui-en)}
+  .nav-avatar:hover{transform:scale(1.08)}
+
+  .hero{max-width:1200px;margin:0 auto;padding:72px 24px 48px;text-align:center}
+  .hero-badge{display:inline-block;padding:5px 18px;border-radius:50px;background:var(--orange-pale);color:var(--orange);font-size:13px;font-weight:600;margin-bottom:24px;border:1px solid rgba(232,80,10,.2)}
+  .hero h1{font-family:var(--ff-display);font-size:clamp(32px,5vw,54px);font-weight:700;line-height:1.25;color:var(--ink);margin-bottom:18px}
+  .hero h1 em{color:var(--orange);font-style:normal}
+  .hero p{font-size:17px;color:var(--ink-mid);max-width:500px;margin:0 auto 32px;line-height:1.8}
+  .hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+  .section{max-width:1200px;margin:0 auto;padding:0 24px 72px}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+  .section-title{font-family:var(--ff-display);font-size:24px;font-weight:600;display:flex;align-items:center;gap:10px}
+  .section-title::before{content:'';display:block;width:4px;height:22px;background:var(--orange);border-radius:2px}
+
+  .articles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:28px}
+  .article-card{background:var(--bg-white);border-radius:14px;border:1px solid var(--border);overflow:hidden;transition:transform .25s,box-shadow .25s;cursor:pointer;text-decoration:none;color:inherit;display:block}
+  .article-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:rgba(232,80,10,.2)}
+  .card-cover{width:100%;height:180px;object-fit:cover;display:block}
+  .card-cover-placeholder{width:100%;height:180px;background:linear-gradient(135deg,#FFF3EE 0%,#FDEBD0 100%);display:flex;align-items:center;justify-content:center;font-size:48px;opacity:.6}
+  .card-body{padding:20px}
+  .card-meta{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+  .card-author{font-size:13px;color:var(--ink-mid);font-weight:500}
+  .card-time,.card-reading{font-size:12px;color:var(--ink-soft)}
+  .card-title{font-family:var(--ff-body);font-size:18px;font-weight:600;line-height:1.5;margin-bottom:8px;color:var(--ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .card-desc{font-size:14px;color:var(--ink-soft);line-height:1.7;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+  .card-views{font-size:12px;color:var(--ink-soft)}
+
+  .pagination{display:flex;gap:8px;justify-content:center;margin-top:48px}
+  .page-btn{width:40px;height:40px;border-radius:50%;border:1.5px solid var(--border-strong);background:white;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-family:var(--ff-ui-en)}
+  .page-btn:hover{border-color:var(--orange);color:var(--orange)}
+  .page-btn.active{background:var(--orange);color:white;border-color:var(--orange)}
+
+  .modal-overlay{position:fixed;inset:0;background:rgba(26,26,26,.6);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;animation:fadeOverlay .2s ease}
+  @keyframes fadeOverlay{from{opacity:0}to{opacity:1}}
+  .modal{background:var(--bg-white);border-radius:18px;width:100%;max-width:480px;max-height:90vh;overflow-y:auto;box-shadow:var(--shadow-lg);animation:slideUp .3s ease}
+  @keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+  .modal-header{padding:28px 28px 0;display:flex;align-items:center;justify-content:space-between}
+  .modal-title{font-family:var(--ff-display);font-size:22px;font-weight:700}
+  .modal-close{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border-strong);background:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;color:var(--ink-mid);transition:all .2s;flex-shrink:0}
+  .modal-close:hover{background:var(--orange-pale);color:var(--orange);border-color:var(--orange)}
+  .modal-body{padding:24px 28px 28px}
+  .form-group{margin-bottom:18px}
+
+  .reader-container{max-width:1200px;margin:0 auto;padding:0 24px}
+  .reader-header{padding:48px 0 40px;max-width:720px;margin:0 auto}
+  .reader-title{font-family:var(--ff-body);font-size:clamp(26px,4vw,40px);font-weight:700;line-height:1.35;margin-bottom:20px}
+  .reader-meta{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+  .reader-author-link{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+  .reader-author-avatar{width:40px;height:40px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;font-family:var(--ff-ui-en)}
+  .reader-author-name{font-size:15px;font-weight:600}
+  .reader-date{font-size:13px;color:var(--ink-soft)}
+  .reader-stats{display:flex;gap:20px;font-size:14px;color:var(--ink-soft);flex-wrap:wrap}
+  .reader-cover{width:100%;max-height:420px;object-fit:cover;border-radius:14px;display:block}
+
+  .reading-progress{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(250,250,248,.95);backdrop-filter:blur(8px);border-top:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:14px}
+  .progress-bar-wrap{flex:1;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+  .progress-bar-fill{height:100%;background:var(--orange);border-radius:3px;transition:width .3s}
+  .progress-label{font-size:13px;color:var(--ink-soft);white-space:nowrap;font-family:var(--ff-ui-en)}
+  .page-nav{display:flex;gap:8px}
+  .page-nav-btn{padding:6px 16px;border-radius:50px;border:1.5px solid var(--border-strong);background:white;cursor:pointer;font-size:13px;font-family:var(--ff-ui);display:flex;align-items:center;gap:5px;transition:all .2s}
+  .page-nav-btn:hover{border-color:var(--orange);color:var(--orange)}
+  .page-nav-btn:disabled{opacity:.4;cursor:not-allowed}
+  .page-nav-btn.active-nav{background:var(--orange);color:white;border-color:var(--orange)}
+
+  .article-content{max-width:720px;margin:0 auto;padding:40px 0 120px;font-family:var(--ff-body);font-size:18px;line-height:1.9;color:var(--ink)}
+  .article-content.ltr{direction:ltr;text-align:left;font-family:var(--ff-body-en)}
+  .article-content h1,.article-content h2,.article-content h3,.article-content h4{font-family:var(--ff-body);font-weight:700;line-height:1.4;margin:40px 0 16px;color:var(--ink)}
+  .article-content.ltr h1,.article-content.ltr h2,.article-content.ltr h3{font-family:var(--ff-body-en)}
+  .article-content h1{font-size:32px}.article-content h2{font-size:26px}.article-content h3{font-size:21px}.article-content h4{font-size:18px}
+  .article-content p{margin-bottom:24px}
+  .article-content strong{font-weight:700}.article-content em{font-style:italic;color:var(--ink-mid)}
+  .article-content ul,.article-content ol{margin:0 24px 24px}.article-content li{margin-bottom:8px}
+  .article-content blockquote{margin:32px 0;padding:20px 24px;border-inline-start:4px solid var(--orange);background:var(--orange-pale);border-radius:0 var(--r) var(--r) 0;font-style:italic;color:var(--ink-mid)}
+  .article-content img{max-width:100%;border-radius:10px;margin:24px 0}
+  .article-content a{color:var(--orange);text-decoration:underline;text-underline-offset:3px}
+  .article-content table{width:100%;border-collapse:collapse;margin:24px 0}
+  .article-content th,.article-content td{padding:10px 16px;border:1px solid var(--border);font-size:15px}
+  .article-content th{background:var(--orange-pale);font-weight:600}
+
+  .dash-layout{max-width:1100px;margin:0 auto;padding:48px 24px}
+  .dash-title{font-family:var(--ff-display);font-size:28px;font-weight:700;margin-bottom:6px}
+  .dash-sub{color:var(--ink-soft);font-size:15px}
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:40px}
+  .stat-card{background:var(--bg-white);border-radius:14px;padding:20px 22px;border:1px solid var(--border);transition:box-shadow .2s}
+  .stat-card:hover{box-shadow:var(--shadow-md)}
+  .stat-number{font-size:32px;font-weight:700;font-family:var(--ff-display-en);color:var(--orange);line-height:1;margin-bottom:4px}
+  .stat-label{font-size:13px;color:var(--ink-soft)}
+  .articles-table{width:100%;background:white;border-radius:14px;border:1px solid var(--border);overflow:hidden}
+  .table-header{display:grid;grid-template-columns:1fr 100px 80px 80px 100px;padding:14px 20px;background:var(--bg);border-bottom:1px solid var(--border);font-size:12px;font-weight:600;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.5px}
+  .table-row{display:grid;grid-template-columns:1fr 100px 80px 80px 100px;padding:16px 20px;border-bottom:1px solid var(--border);align-items:center;transition:background .15s}
+  .table-row:last-child{border-bottom:none}
+  .table-row:hover{background:var(--bg)}
+  .table-title{font-size:15px;font-weight:500;cursor:pointer;color:var(--ink);display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+  .table-title:hover{color:var(--orange)}
+  .status-badge{display:inline-block;padding:3px 10px;border-radius:50px;font-size:11px;font-weight:600}
+  .status-published{background:#DCFCE7;color:#16A34A}.status-draft{background:var(--border);color:var(--ink-soft)}
+  .table-actions{display:flex;gap:6px}
+  .icon-btn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border-strong);background:none;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+  .icon-btn:hover{border-color:var(--orange);background:var(--orange-pale)}
+  .icon-btn.danger:hover{border-color:#DC2626;background:#FEF2F2}
+
+  .upload-area{border:2px dashed var(--border-strong);border-radius:16px;padding:48px 32px;text-align:center;cursor:pointer;transition:all .25s;background:var(--bg)}
+  .upload-area:hover,.upload-area.drag-over{border-color:var(--orange);background:var(--orange-pale)}
+  .upload-icon{font-size:48px;margin-bottom:16px}
+  .upload-title{font-size:18px;font-weight:600;margin-bottom:8px}
+  .upload-sub{color:var(--ink-soft);font-size:14px}
+  .preview-panel{background:white;border:1px solid var(--border);border-radius:14px;padding:28px;max-height:400px;overflow-y:auto;font-family:var(--ff-body);font-size:15px;line-height:1.8}
+  .preview-panel h1,.preview-panel h2,.preview-panel h3{margin:16px 0 8px;font-weight:700}
+  .preview-panel p{margin-bottom:14px}
+  .preview-panel img{max-width:100%;border-radius:8px}
+
+  .author-hero{background:linear-gradient(135deg,var(--orange-pale) 0%,var(--bg) 60%);border-bottom:1px solid var(--border);padding:56px 24px 40px}
+  .author-inner{max-width:1200px;margin:0 auto;display:flex;gap:32px;align-items:flex-start}
+  .author-avatar-lg{width:88px;height:88px;border-radius:50%;background:var(--orange);color:#fff;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:700;flex-shrink:0;border:3px solid white;box-shadow:var(--shadow-md);font-family:var(--ff-ui-en)}
+  .author-name{font-family:var(--ff-display);font-size:28px;font-weight:700;margin-bottom:8px}
+  .author-bio{color:var(--ink-mid);font-size:15px;line-height:1.7;margin-bottom:16px;max-width:600px}
+  .author-stats{display:flex;gap:24px;flex-wrap:wrap}
+  .author-stat-n{font-size:22px;font-weight:700;color:var(--orange);font-family:var(--ff-display-en)}
+  .author-stat-l{font-size:12px;color:var(--ink-soft)}
+
+  .empty-state{text-align:center;padding:80px 20px}
+  .empty-icon{font-size:56px;margin-bottom:16px;opacity:.4}
+  .empty-title{font-size:20px;font-weight:600;margin-bottom:8px;color:var(--ink-mid)}
+  .empty-sub{font-size:14px;color:var(--ink-soft);margin-bottom:24px}
+
+  .notif{position:fixed;bottom:80px;z-index:300;padding:12px 20px;border-radius:var(--r);font-size:14px;font-weight:500;box-shadow:var(--shadow-lg);animation:slideNotif .3s ease;max-width:320px}
+  html[dir="ltr"] .notif{right:20px}
+  html[dir="rtl"] .notif{left:20px}
+  .notif-success{background:#F0FDF4;color:#15803D;border:1px solid #BBF7D0}
+  .notif-error{background:#FEF2F2;color:#DC2626;border:1px solid #FECACA}
+  @keyframes slideNotif{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  .page-loading{display:flex;align-items:center;justify-content:center;height:60vh;gap:12px;color:var(--ink-soft);font-size:15px}
+
+  @media(max-width:640px){
+    .hero{padding:48px 20px 32px}
+    .articles-grid{grid-template-columns:1fr}
+    .table-header,.table-row{grid-template-columns:1fr 80px 60px}
+    .table-header>*:nth-child(4),.table-header>*:nth-child(5),
+    .table-row>*:nth-child(4),.table-row>*:nth-child(5){display:none}
+    .author-inner{flex-direction:column}
+    .stats-grid{grid-template-columns:repeat(2,1fr)}
+    .reading-progress{padding:10px 12px;gap:8px}
+    .page-nav-btn{padding:5px 10px;font-size:12px}
+    .nav-links{gap:5px}
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+// ─── Translations ─────────────────────────────────────────────────────────────
+const T = {
+  ar: {
+    newArticle:'+ مقال جديد', login:'تسجيل الدخول', register:'إنشاء حساب',
+    heroBadge:'✍️ منصة التدوين',
+    heroTitle1:'اكتب في ', heroTitleEm:'وورد', heroTitle2:'، انشر بنقرة واحدة',
+    heroDesc:'منصة تدوين بسيطة تحترم الكاتب — بدون محرر معقد. فقط ارفع ملف وورد وانشر.',
+    heroCtaStart:'ابدأ الكتابة مجاناً', heroCtaHave:'لديك حساب؟',
+    latestArticles:'أحدث المقالات', loading:'جاري التحميل...',
+    noArticlesYet:'لا يوجد مقالات بعد', beFirst:'كن أول من ينشر مقالاً',
+    publishFirst:'نشر أول مقال', minRead:'د',
+    welcomeBack:'مرحباً بعودتك', joinInkwell:'انضم إلى Inkwell',
+    fullName:'الاسم الكامل', fullNamePH:'أحمد محمد',
+    username:'اسم المستخدم (بالإنجليزية)', usernamePH:'ahmed_writes',
+    email:'البريد الإلكتروني', password:'كلمة المرور',
+    loginBtn:'دخول', registerBtn:'إنشاء الحساب',
+    authError:'حدث خطأ، حاول مجدداً',
+    minReadFull:'دقيقة للقراءة', words:'كلمة',
+    pageOf:(c,t)=>`صفحة ${c} من ${t}`, views:'مشاهدة',
+    willBePaged:'سيُعرض على صفحات',
+    prevPage:'السابقة', nextPage:'التالية',
+    backHome:'← العودة للرئيسية',
+    moreFrom:(n)=>`المزيد من ${n}`,
+    articleNotFound:'المقال غير موجود',
+    articles:'مقالات', totalViews:'مشاهدة', memberSince:'عضو منذ',
+    authorArticles:(n)=>`مقالات ${n}`, noArticlesAuthor:'لا يوجد مقالات بعد',
+    uploadTitle:'رفع مقال جديد', uploadSub:'اكتب مقالك في Word ثم ارفعه هنا',
+    uploadStep1:'رفع الملف', uploadStep2:'تفاصيل المقال', uploadStep3:'نشر',
+    dropHere:'اسحب ملف .docx هنا أو انقر للاختيار',
+    dropSub:'الحد الأقصى 20 ميجابايت · يدعم العربية والإنجليزية',
+    tipsTitle:'💡 نصائح للحصول على أفضل نتيجة:',
+    tip1:'استخدم أنماط العناوين (Heading 1, Heading 2) للعناوين الرئيسية',
+    tip2:'الخط العريض والمائل سيتم الحفاظ عليهما تلقائياً',
+    tip3:'يمكنك إدراج صور داخل المستند وستُستخرج معه',
+    articleDetails:'تفاصيل المقال',
+    articleDetailsSub:'أضف عنواناً ووصفاً وصورة غلاف قبل النشر',
+    articleTitle:'عنوان المقال *', articleTitlePH:'عنوان جذاب وواضح...',
+    articleDesc:'وصف مختصر', articleDescPH:'جملة أو اثنتان تلخص المقال...',
+    articleTags:'التاغات (مفصولة بفاصلة)', articleTagsPH:'ذكاء اصطناعي, تقنية',
+    coverImage:'صورة الغلاف', changeCover:'🔄 تغيير الصورة',
+    uploadCover:'📷 رفع صورة الغلاف', useFirstImg:'🖼 استخدام أول صورة في الملف',
+    langLabel:(l)=>l==='ar'?'عربي':'إنجليزي',
+    contentPreview:'معاينة المحتوى',
+    publishNow:'🚀 نشر الآن', saveDraft:'💾 حفظ كمسودة', goBack:'← رجوع',
+    dashboard:'لوحة التحكم', hello:(n)=>`مرحباً، ${n} 👋`,
+    profile:'⚙️ الملف الشخصي',
+    published:'مقالات منشورة', drafts:'مسودات',
+    totalViewsStat:'إجمالي المشاهدات', totalArticles:'إجمالي المقالات',
+    myArticles:'مقالاتي', myPublicPage:'👁 صفحتي العامة',
+    nothingYet:'لم تكتب شيئاً بعد', uploadFirst:'ارفع مقالك الأول الآن',
+    tableTitle:'العنوان', tableStatus:'الحالة', tableViews:'المشاهدات',
+    tableWords:'الكلمات', tableActions:'إجراءات',
+    statusPublished:'منشور', statusDraft:'مسودة',
+    toDraft:'تحويل لمسودة', toPublish:'نشر', delete:'حذف',
+    confirmDelete:'هل أنت متأكد من حذف هذا المقال؟',
+    articleDeleted:'تم حذف المقال',
+    profileTitle:'الملف الشخصي', bioLabel:'نبذة تعريفية',
+    bioPH:'أخبر القراء عن نفسك...',
+    saveChanges:'حفظ التغييرات', cancel:'إلغاء', profileSaved:'تم حفظ الملف الشخصي',
+    loggedOut:'تم تسجيل الخروج', welcome:(n)=>`مرحباً ${n}! 🎉`,
+    published_ok:'تم نشر المقال! 🎉', draft_ok:'تم حفظ المسودة',
+    published_status:'تم نشر المقال', draft_status:'تم تحويله لمسودة',
+    titleRequired:'يرجى إضافة عنوان للمقال', onlyDocx:'الرجاء رفع ملف .docx فقط',
+    mustLogin:'يجب تسجيل الدخول أولاً',
+    now:'الآن', minutesAgo:(n)=>`منذ ${n} دقيقة`,
+    hoursAgo:(n)=>`منذ ${n} ساعة`, daysAgo:(n)=>`منذ ${n} يوم`, locale:'ar-SA',
+    switchLang:'EN', switchLangTitle:'Switch to English',
+  },
+  en: {
+    newArticle:'+ New Article', login:'Log in', register:'Sign up',
+    heroBadge:'✍️ Blogging Platform',
+    heroTitle1:'Write in ', heroTitleEm:'Word', heroTitle2:', publish in one click',
+    heroDesc:'A simple blogging platform that respects the writer — no complex editor. Upload a Word file and publish.',
+    heroCtaStart:'Start writing free', heroCtaHave:'Have an account?',
+    latestArticles:'Latest Articles', loading:'Loading...',
+    noArticlesYet:'No articles yet', beFirst:'Be the first to publish',
+    publishFirst:'Publish first article', minRead:'min',
+    welcomeBack:'Welcome back', joinInkwell:'Join Inkwell',
+    fullName:'Full name', fullNamePH:'John Smith',
+    username:'Username (letters & numbers)', usernamePH:'john_writes',
+    email:'Email address', password:'Password',
+    loginBtn:'Log in', registerBtn:'Create account',
+    authError:'Something went wrong, please try again',
+    minReadFull:'min read', words:'words',
+    pageOf:(c,t)=>`Page ${c} of ${t}`, views:'views',
+    willBePaged:'Will be displayed as pages',
+    prevPage:'← Prev', nextPage:'Next →',
+    backHome:'← Back to home',
+    moreFrom:(n)=>`More from ${n}`,
+    articleNotFound:'Article not found',
+    articles:'Articles', totalViews:'Views', memberSince:'Member since',
+    authorArticles:(n)=>`Articles by ${n}`, noArticlesAuthor:'No articles yet',
+    uploadTitle:'Upload new article', uploadSub:'Write your article in Word, then upload it here',
+    uploadStep1:'Upload file', uploadStep2:'Article details', uploadStep3:'Publish',
+    dropHere:'Drag a .docx file here or click to choose',
+    dropSub:'Max 20 MB · Supports Arabic & English formatting',
+    tipsTitle:'💡 Tips for best results:',
+    tip1:'Use built-in heading styles (Heading 1, Heading 2) for section titles',
+    tip2:'Bold and italic formatting will be preserved automatically',
+    tip3:'Images embedded in the document will be extracted with it',
+    articleDetails:'Article details',
+    articleDetailsSub:'Add a title, description, and cover image before publishing',
+    articleTitle:'Article title *', articleTitlePH:'A clear, compelling title...',
+    articleDesc:'Short description', articleDescPH:'One or two sentences that summarize the article...',
+    articleTags:'Tags (comma separated)', articleTagsPH:'AI, technology, future',
+    coverImage:'Cover image', changeCover:'🔄 Change image',
+    uploadCover:'📷 Upload cover image', useFirstImg:'🖼 Use first image from file',
+    langLabel:(l)=>l==='ar'?'Arabic':'English',
+    contentPreview:'Content preview',
+    publishNow:'🚀 Publish now', saveDraft:'💾 Save as draft', goBack:'← Back',
+    dashboard:'Dashboard', hello:(n)=>`Hello, ${n} 👋`,
+    profile:'⚙️ Profile',
+    published:'Published', drafts:'Drafts',
+    totalViewsStat:'Total views', totalArticles:'Total articles',
+    myArticles:'My articles', myPublicPage:'👁 My public page',
+    nothingYet:"You haven't written anything yet", uploadFirst:'Upload your first article now',
+    tableTitle:'Title', tableStatus:'Status', tableViews:'Views',
+    tableWords:'Words', tableActions:'Actions',
+    statusPublished:'Published', statusDraft:'Draft',
+    toDraft:'Move to draft', toPublish:'Publish', delete:'Delete',
+    confirmDelete:'Are you sure you want to delete this article?',
+    articleDeleted:'Article deleted',
+    profileTitle:'Profile', bioLabel:'Bio',
+    bioPH:'Tell readers about yourself...',
+    saveChanges:'Save changes', cancel:'Cancel', profileSaved:'Profile saved',
+    loggedOut:'Logged out successfully', welcome:(n)=>`Welcome, ${n}! 🎉`,
+    published_ok:'Article published! 🎉', draft_ok:'Draft saved',
+    published_status:'Article published', draft_status:'Moved to draft',
+    titleRequired:'Please add a title for the article', onlyDocx:'Please upload a .docx file only',
+    mustLogin:'You must be logged in',
+    now:'Just now', minutesAgo:(n)=>`${n}m ago`,
+    hoursAgo:(n)=>`${n}h ago`, daysAgo:(n)=>`${n}d ago`, locale:'en-US',
+    switchLang:'عربي', switchLangTitle:'التبديل للعربية',
+  }
+};
+
+// ─── API ──────────────────────────────────────────────────────────────────────
+const API = {
+  token:()=>localStorage.getItem('iw_token'),
+  headers:()=>({'Content-Type':'application/json',...(API.token()?{Authorization:`Bearer ${API.token()}`}:{})}),
+  get:(url)=>fetch(url,{headers:API.headers()}).then(r=>r.json()),
+  post:(url,data)=>fetch(url,{method:'POST',headers:API.headers(),body:JSON.stringify(data)}).then(r=>r.json()),
+  put:(url,data)=>fetch(url,{method:'PUT',headers:API.headers(),body:JSON.stringify(data)}).then(r=>r.json()),
+  del:(url)=>fetch(url,{method:'DELETE',headers:API.headers()}).then(r=>r.json()),
+};
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+function timeAgo(dateStr, t) {
+  const diff = Math.floor((Date.now() - new Date(dateStr)) / 1000);
+  if (diff < 60) return t.now;
+  if (diff < 3600) return t.minutesAgo(Math.floor(diff/60));
+  if (diff < 86400) return t.hoursAgo(Math.floor(diff/3600));
+  if (diff < 2592000) return t.daysAgo(Math.floor(diff/86400));
+  return new Date(dateStr).toLocaleDateString(t.locale);
+}
+
+function splitIntoPages(html, wpp=400) {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = html;
+  const blocks = Array.from(tmp.querySelectorAll('p,h1,h2,h3,h4,h5,blockquote,ul,ol,img,table'));
+  if (!blocks.length) return [html];
+  const pages=[]; let cur='', curW=0;
+  blocks.forEach(el => {
+    const wc=(el.innerText||'').split(/\s+/).length;
+    if (curW+wc>wpp&&cur){pages.push(cur);cur=el.outerHTML;curW=wc;}
+    else{cur+=el.outerHTML;curW+=wc;}
+  });
+  if(cur)pages.push(cur);
+  return pages.length?pages:[html];
+}
+
+function initials(name) {
+  if (!name) return '?';
+  const p = name.trim().split(/\s+/);
+  return (p.length>=2?p[0][0]+p[1][0]:name[0]).toUpperCase();
+}
+
+// ─── Notification ─────────────────────────────────────────────────────────────
+function Notification({msg,type,onClose}) {
+  useEffect(()=>{const id=setTimeout(onClose,3200);return()=>clearTimeout(id);},[]);
+  return <div className={`notif notif-${type}`}>{msg}</div>;
+}
+
+// ─── Navbar ───────────────────────────────────────────────────────────────────
+function Navbar({user,onLogin,onRegister,navigate,lang,onToggleLang}) {
+  const t=T[lang];
+  return (
+    <nav>
+      <div className="nav-inner">
+        <a className="nav-logo" href="#" onClick={e=>{e.preventDefault();navigate('home');}}>
+          <span className="dot"></span>Inkwell
+        </a>
+        <div className="nav-links">
+          <button className="lang-btn" onClick={onToggleLang} title={t.switchLangTitle}>
+            {lang==='ar'?'🇬🇧':'🇸🇦'} {t.switchLang}
+          </button>
+          {user ? (
+            <>
+              <button className="btn btn-primary btn-sm" onClick={()=>navigate('new')}>{t.newArticle}</button>
+              <a className="nav-avatar" href="#" title={user.displayName} onClick={e=>{e.preventDefault();navigate('dashboard');}}>
+                {initials(user.displayName)}
+              </a>
+            </>
+          ) : (
+            <>
+              <button className="btn btn-ghost btn-sm" onClick={onLogin}>{t.login}</button>
+              <button className="btn btn-primary btn-sm" onClick={onRegister}>{t.register}</button>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+// ─── Auth Modal ───────────────────────────────────────────────────────────────
+function AuthModal({mode,onClose,onSuccess,lang}) {
+  const t=T[lang];
+  const [tab,setTab]=useState(mode);
+  const [form,setForm]=useState({email:'',password:'',username:'',displayName:''});
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState('');
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  async function submit() {
+    setError('');setLoading(true);
+    try {
+      const res=await API.post(tab==='login'?'/api/auth/login':'/api/auth/register',form);
+      if(res.error)setError(res.error);
+      else{localStorage.setItem('iw_token',res.token);onSuccess(res.user);}
+    } catch{setError(t.authError);}
+    setLoading(false);
+  }
+
+  return (
+    <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&onClose()}>
+      <div className="modal" dir={lang==='ar'?'rtl':'ltr'}>
+        <div className="modal-header">
+          <span className="modal-title">{tab==='login'?t.welcomeBack:t.joinInkwell}</span>
+          <button className="modal-close" onClick={onClose}>✕</button>
+        </div>
+        <div className="modal-body">
+          <div style={{display:'flex',gap:8,marginBottom:24}}>
+            {['login','register'].map(tp=>(
+              <button key={tp} className={`btn ${tab===tp?'btn-primary':'btn-ghost'} btn-sm`}
+                style={{flex:1}} onClick={()=>{setTab(tp);setError('');}}>
+                {tp==='login'?t.login:t.register}
+              </button>
+            ))}
+          </div>
+          {tab==='register'&&(
+            <>
+              <div className="form-group"><label>{t.fullName}</label><input placeholder={t.fullNamePH} value={form.displayName} onChange={e=>set('displayName',e.target.value)}/></div>
+              <div className="form-group"><label>{t.username}</label><input placeholder={t.usernamePH} value={form.username} onChange={e=>set('username',e.target.value)} dir="ltr"/></div>
+            </>
+          )}
+          <div className="form-group"><label>{t.email}</label><input type="email" placeholder="you@example.com" value={form.email} onChange={e=>set('email',e.target.value)} dir="ltr"/></div>
+          <div className="form-group"><label>{t.password}</label><input type="password" placeholder="••••••••" value={form.password} onChange={e=>set('password',e.target.value)} dir="ltr"/></div>
+          {error&&<div style={{color:'#DC2626',fontSize:13,marginBottom:12,padding:'8px 12px',background:'#FEF2F2',borderRadius:8}}>{error}</div>}
+          <button className="btn btn-primary" style={{width:'100%',justifyContent:'center'}} onClick={submit} disabled={loading}>
+            {loading?<span className="spinner"></span>:tab==='login'?t.loginBtn:t.registerBtn}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Article Card ─────────────────────────────────────────────────────────────
+function ArticleCard({article,navigate,lang}) {
+  const t=T[lang];
+  const isRtl=article.language==='ar';
+  return (
+    <a className="article-card fade-in" href="#" onClick={e=>{e.preventDefault();navigate('article',article.id);}}>
+      {article.coverImage
+        ?<img className="card-cover" src={article.coverImage} alt="" onError={e=>e.target.style.display='none'}/>
+        :<div className="card-cover-placeholder">📄</div>
+      }
+      <div className="card-body" dir={isRtl?'rtl':'ltr'}>
+        <div className="card-meta">
+          {article.author&&<span className="card-author" onClick={e=>{e.preventDefault();e.stopPropagation();navigate('author',article.author.username);}}>{article.author.displayName}</span>}
+          <span style={{color:'var(--ink-pale)'}}>·</span>
+          <span className="card-time">{timeAgo(article.publishedAt||article.createdAt,t)}</span>
+          <span style={{color:'var(--ink-pale)'}}>·</span>
+          <span className="card-reading">⏱ {article.readingTime} {t.minRead}</span>
+        </div>
+        <div className="card-title">{article.title}</div>
+        {article.description&&<div className="card-desc">{article.description}</div>}
+        <div className="card-footer">
+          <span className="card-views">👁 {(article.views||0).toLocaleString()}</span>
+          <div style={{display:'flex',gap:6,flexWrap:'wrap'}}>
+            {(article.tags||[]).slice(0,2).map(tag=><span key={tag} className="tag">{tag}</span>)}
+          </div>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+// ─── Home Page ────────────────────────────────────────────────────────────────
+function HomePage({navigate,user,onLogin,onRegister,lang}) {
+  const t=T[lang];
+  const [articles,setArticles]=useState([]);
+  const [loading,setLoading]=useState(true);
+  const [page,setPage]=useState(1);
+  const [pages,setPages]=useState(1);
+
+  useEffect(()=>{load(page);},[page]);
+  async function load(p) {
+    setLoading(true);
+    const data=await API.get(`/api/articles?page=${p}&limit=9`);
+    setArticles(data.articles||[]);setPages(data.pages||1);setLoading(false);
+  }
+
+  return (
+    <div>
+      {!user&&(
+        <div className="hero fade-in" dir={lang==='ar'?'rtl':'ltr'}>
+          <div className="hero-badge">{t.heroBadge}</div>
+          <h1>{t.heroTitle1}<em>{t.heroTitleEm}</em>{t.heroTitle2}</h1>
+          <p>{t.heroDesc}</p>
+          <div className="hero-cta">
+            <button className="btn btn-primary" onClick={onRegister}>{t.heroCtaStart}</button>
+            <button className="btn btn-ghost" onClick={onLogin}>{t.heroCtaHave}</button>
+          </div>
+        </div>
+      )}
+      <div className="section">
+        <div className="section-header">
+          <h2 className="section-title">{t.latestArticles}</h2>
+          {user&&<button className="btn btn-primary btn-sm" onClick={()=>navigate('new')}>{t.newArticle}</button>}
+        </div>
+        {loading?(
+          <div className="page-loading"><span className="spinner"></span> {t.loading}</div>
+        ):articles.length===0?(
+          <div className="empty-state fade-in">
+            <div className="empty-icon">📝</div>
+            <div className="empty-title">{t.noArticlesYet}</div>
+            <div className="empty-sub">{t.beFirst}</div>
+            {user&&<button className="btn btn-primary" onClick={()=>navigate('new')}>{t.publishFirst}</button>}
+          </div>
+        ):(
+          <>
+            <div className="articles-grid fade-in">
+              {articles.map(a=><ArticleCard key={a.id} article={a} navigate={navigate} lang={lang}/>)}
+            </div>
+            {pages>1&&(
+              <div className="pagination">
+                <button className="page-btn" onClick={()=>setPage(p=>Math.max(1,p-1))} disabled={page===1}>‹</button>
+                {Array.from({length:pages},(_,i)=>(
+                  <button key={i} className={`page-btn ${page===i+1?'active':''}`} onClick={()=>setPage(i+1)}>{i+1}</button>
+                ))}
+                <button className="page-btn" onClick={()=>setPage(p=>Math.min(pages,p+1))} disabled={page===pages}>›</button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Article Reader ───────────────────────────────────────────────────────────
+function ArticleReader({articleId,navigate,lang}) {
+  const t=T[lang];
+  const [article,setArticle]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [pages,setPages]=useState([]);
+  const [curPage,setCurPage]=useState(0);
+  const [progress,setProgress]=useState(0);
+
+  useEffect(()=>{load();API.post(`/api/articles/${articleId}/view`,{});},[articleId]);
+
+  async function load() {
+    setLoading(true);
+    const data=await API.get(`/api/articles/${articleId}`);
+    setArticle(data);
+    if(data.content){
+      const paged=(data.wordCount||0)>1500?splitIntoPages(data.content,350):[data.content];
+      setPages(paged);
+    }
+    setLoading(false);setCurPage(0);
+  }
+
+  useEffect(()=>{if(pages.length>1)setProgress(Math.round(((curPage+1)/pages.length)*100));},[curPage,pages]);
+  useEffect(()=>{window.scrollTo({top:0,behavior:'smooth'});},[curPage]);
+
+  if(loading)return<div className="page-loading"><span className="spinner"></span> {t.loading}</div>;
+  if(!article||article.error)return(
+    <div className="empty-state">
+      <div className="empty-icon">😕</div>
+      <div className="empty-title">{t.articleNotFound}</div>
+      <button className="btn btn-ghost" onClick={()=>navigate('home')}>{t.backHome}</button>
+    </div>
+  );
+
+  const isRtl=article.language!=='en';
+  const author=article.author;
+
+  return(
+    <div className="reader-container fade-in">
+      <div className="reader-header" dir={isRtl?'rtl':'ltr'}>
+        {article.tags?.length>0&&(
+          <div style={{marginBottom:16,display:'flex',gap:8,flexWrap:'wrap'}}>
+            {article.tags.map(tag=><span key={tag} className="tag">{tag}</span>)}
+          </div>
+        )}
+        <h1 className="reader-title">{article.title}</h1>
+        <div className="reader-meta">
+          {author&&(
+            <a className="reader-author-link" href="#" onClick={e=>{e.preventDefault();navigate('author',author.username);}}>
+              <div className="reader-author-avatar">{initials(author.displayName)}</div>
+              <div>
+                <div className="reader-author-name">{author.displayName}</div>
+                <div className="reader-date">{timeAgo(article.publishedAt||article.createdAt,t)}</div>
+              </div>
+            </a>
+          )}
+        </div>
+        <div className="reader-stats">
+          <span>⏱ {article.readingTime} {t.minReadFull}</span>
+          <span>📊 {(article.wordCount||0).toLocaleString()} {t.words}</span>
+          {pages.length>1&&<span>📖 {t.pageOf(curPage+1,pages.length)}</span>}
+          <span>👁 {(article.views||0).toLocaleString()} {t.views}</span>
+        </div>
+      </div>
+
+      {article.coverImage&&<img className="reader-cover" src={article.coverImage} alt={article.title}/>}
+
+      <div className={`article-content ${!isRtl?'ltr':''}`} dir={isRtl?'rtl':'ltr'}
+        dangerouslySetInnerHTML={{__html:pages[curPage]||''}}/>
+
+      {pages.length>1&&(
+        <div className="reading-progress">
+          <span className="progress-label">{progress}%</span>
+          <div className="progress-bar-wrap"><div className="progress-bar-fill" style={{width:progress+'%'}}></div></div>
+          <div className="page-nav">
+            <button className="page-nav-btn" onClick={()=>setCurPage(p=>p-1)} disabled={curPage===0}>{t.prevPage}</button>
+            {pages.length<=8&&pages.map((_,i)=>(
+              <button key={i} className={`page-nav-btn ${curPage===i?'active-nav':''}`} onClick={()=>setCurPage(i)}>{i+1}</button>
+            ))}
+            <button className="page-nav-btn" onClick={()=>setCurPage(p=>p+1)} disabled={curPage===pages.length-1}>{t.nextPage}</button>
+          </div>
+        </div>
+      )}
+
+      <div style={{textAlign:'center',paddingBottom:48,paddingTop:16}}>
+        <button className="btn btn-ghost" onClick={()=>navigate('home')}>{t.backHome}</button>
+        {author&&<button className="btn btn-outline" style={{margin:'0 8px'}} onClick={()=>navigate('author',author.username)}>{t.moreFrom(author.displayName)}</button>}
+      </div>
+    </div>
+  );
+}
+
+// ─── Author Page ──────────────────────────────────────────────────────────────
+function AuthorPage({username,navigate,lang}) {
+  const t=T[lang];
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+
+  useEffect(()=>{load();},[username]);
+  async function load(){setLoading(true);const res=await API.get(`/api/users/${username}`);setData(res);setLoading(false);}
+
+  if(loading)return<div className="page-loading"><span className="spinner"></span></div>;
+  if(!data||data.error)return<div className="empty-state"><div className="empty-icon">😕</div><div className="empty-title">{t.articleNotFound}</div></div>;
+
+  const {user,articles,totalViews}=data;
+  return(
+    <div className="fade-in">
+      <div className="author-hero">
+        <div className="author-inner">
+          <div className="author-avatar-lg">{initials(user.displayName)}</div>
+          <div style={{flex:1}}>
+            <div className="author-name">{user.displayName}</div>
+            {user.bio&&<div className="author-bio">{user.bio}</div>}
+            <div className="author-stats">
+              <div><div className="author-stat-n">{articles.length}</div><div className="author-stat-l">{t.articles}</div></div>
+              <div><div className="author-stat-n">{totalViews.toLocaleString()}</div><div className="author-stat-l">{t.totalViews}</div></div>
+              <div><div className="author-stat-n">{new Date(user.createdAt).getFullYear()}</div><div className="author-stat-l">{t.memberSince}</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="section" style={{paddingTop:48}}>
+        <div className="section-header"><h2 className="section-title">{t.authorArticles(user.displayName)}</h2></div>
+        {articles.length===0
+          ?<div className="empty-state"><div className="empty-icon">📝</div><div className="empty-title">{t.noArticlesAuthor}</div></div>
+          :<div className="articles-grid">{articles.map(a=><ArticleCard key={a.id} article={{...a,author:{displayName:user.displayName,username:user.username}}} navigate={navigate} lang={lang}/>)}</div>
+        }
+      </div>
+    </div>
+  );
+}
+
+// ─── New Article ──────────────────────────────────────────────────────────────
+function NewArticlePage({navigate,notify,lang}) {
+  const t=T[lang];
+  const [step,setStep]=useState('upload');
+  const [dragging,setDragging]=useState(false);
+  const [parsed,setParsed]=useState(null);
+  const [form,setForm]=useState({title:'',description:'',tags:'',coverImage:''});
+  const [publishing,setPublishing]=useState(false);
+  const [coverPreview,setCoverPreview]=useState('');
+  const fileRef=useRef(); const coverRef=useRef();
+  const setF=(k,v)=>setForm(f=>({...f,[k]:v}));
+
+  async function handleFile(file){
+    if(!file?.name.endsWith('.docx')){notify(t.onlyDocx,'error');return;}
+    const fd=new FormData();fd.append('file',file);
+    const res=await fetch('/api/articles/parse',{method:'POST',headers:{Authorization:`Bearer ${API.token()}`},body:fd}).then(r=>r.json());
+    if(res.error){notify(res.error,'error');return;}
+    setParsed(res);setForm(f=>({...f,title:res.suggestedTitle||''}));setStep('form');
+  }
+
+  async function uploadCover(file){
+    const fd=new FormData();fd.append('cover',file);
+    const res=await fetch('/api/articles/cover',{method:'POST',headers:{Authorization:`Bearer ${API.token()}`},body:fd}).then(r=>r.json());
+    if(res.url){setF('coverImage',res.url);setCoverPreview(res.url);}
+  }
+
+  async function publish(status){
+    if(!form.title){notify(t.titleRequired,'error');return;}
+    setPublishing(true);
+    const res=await API.post('/api/articles',{...form,content:parsed.html,tags:form.tags.split(',').map(s=>s.trim()).filter(Boolean),readingTime:parsed.readingTime,wordCount:parsed.words,language:parsed.language,status});
+    setPublishing(false);
+    if(res.id){notify(status==='published'?t.published_ok:t.draft_ok,'success');setTimeout(()=>navigate(status==='published'?'article':'dashboard',res.id),800);}
+    else notify(res.error||t.authError,'error');
+  }
+
+  return(
+    <div className="dash-layout fade-in" style={{maxWidth:800}} dir={lang==='ar'?'rtl':'ltr'}>
+      {/* Steps indicator */}
+      <div style={{display:'flex',alignItems:'center',gap:12,marginBottom:40}}>
+        {[t.uploadStep1,t.uploadStep2,t.uploadStep3].map((s,i)=>(
+          <React.Fragment key={i}>
+            <div style={{display:'flex',alignItems:'center',gap:8}}>
+              <div style={{width:28,height:28,borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',
+                background:(step==='upload'&&i===0)||(step==='form'&&i<=1)?'var(--orange)':'var(--border)',
+                color:(step==='upload'&&i===0)||(step==='form'&&i<=1)?'white':'var(--ink-soft)',
+                fontSize:13,fontWeight:700,fontFamily:'var(--ff-ui-en)',flexShrink:0}}>{i+1}</div>
+              <span style={{fontSize:14,color:'var(--ink-mid)'}}>{s}</span>
+            </div>
+            {i<2&&<div style={{flex:1,height:1,background:'var(--border)'}}></div>}
+          </React.Fragment>
+        ))}
+      </div>
+
+      {step==='upload'&&(
+        <>
+          <div style={{marginBottom:32}}>
+            <div className="dash-title">{t.uploadTitle}</div>
+            <div className="dash-sub">{t.uploadSub}</div>
+          </div>
+          <div className={`upload-area ${dragging?'drag-over':''}`} onClick={()=>fileRef.current.click()}
+            onDragOver={e=>{e.preventDefault();setDragging(true);}} onDragLeave={()=>setDragging(false)}
+            onDrop={e=>{e.preventDefault();setDragging(false);handleFile(e.dataTransfer.files[0]);}}>
+            <input ref={fileRef} type="file" accept=".docx" style={{display:'none'}} onChange={e=>handleFile(e.target.files[0])}/>
+            <div className="upload-icon">📄</div>
+            <div className="upload-title">{t.dropHere}</div>
+            <div className="upload-sub">{t.dropSub}</div>
+          </div>
+          <div style={{marginTop:20,padding:16,background:'var(--orange-pale)',borderRadius:12,border:'1px solid rgba(232,80,10,.15)'}}>
+            <div style={{fontSize:13,color:'var(--orange)',fontWeight:600,marginBottom:8}}>{t.tipsTitle}</div>
+            <ul style={{fontSize:13,color:'var(--ink-mid)',paddingInlineStart:16,display:'flex',flexDirection:'column',gap:6}}>
+              <li>{t.tip1}</li><li>{t.tip2}</li><li>{t.tip3}</li>
+            </ul>
+          </div>
+        </>
+      )}
+
+      {step==='form'&&parsed&&(
+        <>
+          <div style={{marginBottom:32}}>
+            <div className="dash-title">{t.articleDetails}</div>
+            <div className="dash-sub">{t.articleDetailsSub}</div>
+          </div>
+          <div style={{display:'grid',gap:20}}>
+            <div className="form-group"><label>{t.articleTitle}</label><input value={form.title} onChange={e=>setF('title',e.target.value)} placeholder={t.articleTitlePH}/></div>
+            <div className="form-group"><label>{t.articleDesc}</label><textarea value={form.description} onChange={e=>setF('description',e.target.value)} placeholder={t.articleDescPH} rows={3}/></div>
+            <div className="form-group"><label>{t.articleTags}</label><input value={form.tags} onChange={e=>setF('tags',e.target.value)} placeholder={t.articleTagsPH}/></div>
+            <div className="form-group">
+              <label>{t.coverImage}</label>
+              <div style={{display:'flex',gap:12,flexWrap:'wrap',alignItems:'center'}}>
+                {coverPreview&&<img src={coverPreview} alt="" style={{width:160,height:90,objectFit:'cover',borderRadius:8,border:'1px solid var(--border)'}}/>}
+                <button className="btn btn-ghost btn-sm" onClick={()=>coverRef.current.click()}>{coverPreview?t.changeCover:t.uploadCover}</button>
+                {parsed.firstImage&&!coverPreview&&<button className="btn btn-ghost btn-sm" onClick={()=>{setF('coverImage',parsed.firstImage);setCoverPreview(parsed.firstImage);}}>{t.useFirstImg}</button>}
+                <input ref={coverRef} type="file" accept="image/*" style={{display:'none'}} onChange={e=>uploadCover(e.target.files[0])}/>
+              </div>
+            </div>
+            <div style={{display:'flex',gap:16,padding:'14px 18px',background:'var(--bg)',borderRadius:12,border:'1px solid var(--border)',flexWrap:'wrap'}}>
+              <span style={{fontSize:13,color:'var(--ink-soft)'}}>📊 {(parsed.words||0).toLocaleString()} {t.words}</span>
+              <span style={{fontSize:13,color:'var(--ink-soft)'}}>⏱ {parsed.readingTime} {t.minReadFull}</span>
+              <span style={{fontSize:13,color:'var(--ink-soft)'}}>🌐 {t.langLabel(parsed.language)}</span>
+              {parsed.words>1500&&<span style={{fontSize:13,color:'var(--orange)'}}>📖 {t.willBePaged}</span>}
+            </div>
+            <div>
+              <label style={{marginBottom:10}}>{t.contentPreview}</label>
+              <div className="preview-panel" dir={parsed.language==='ar'?'rtl':'ltr'} dangerouslySetInnerHTML={{__html:parsed.html}}/>
+            </div>
+            <div style={{display:'flex',gap:12,flexWrap:'wrap'}}>
+              <button className="btn btn-primary" style={{flex:1,justifyContent:'center'}} onClick={()=>publish('published')} disabled={publishing}>
+                {publishing?<span className="spinner"></span>:t.publishNow}
+              </button>
+              <button className="btn btn-ghost" style={{flex:1,justifyContent:'center'}} onClick={()=>publish('draft')} disabled={publishing}>{t.saveDraft}</button>
+              <button className="btn btn-ghost" onClick={()=>{setStep('upload');setParsed(null);}}>{t.goBack}</button>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
+
+// ─── Dashboard ────────────────────────────────────────────────────────────────
+function DashboardPage({navigate,currentUser,notify,lang}) {
+  const t=T[lang];
+  const [data,setData]=useState(null);
+  const [loading,setLoading]=useState(true);
+  const [editProfile,setEditProfile]=useState(false);
+  const [profileForm,setProfileForm]=useState({displayName:'',bio:''});
+
+  useEffect(()=>{load();},[]);
+
+  async function load(){
+    setLoading(true);
+    const res=await API.get('/api/dashboard');
+    setData(res);setProfileForm({displayName:currentUser?.displayName||'',bio:''});setLoading(false);
+  }
+
+  async function deleteArticle(id){
+    if(!confirm(t.confirmDelete))return;
+    await API.del(`/api/articles/${id}`);notify(t.articleDeleted,'success');load();
+  }
+
+  async function saveProfile(){
+    await API.put('/api/auth/profile',profileForm);notify(t.profileSaved,'success');setEditProfile(false);
+  }
+
+  async function toggleStatus(article){
+    const ns=article.status==='published'?'draft':'published';
+    await API.put(`/api/articles/${article.id}`,{...article,status:ns});
+    notify(ns==='published'?t.published_status:t.draft_status,'success');load();
+  }
+
+  if(loading)return<div className="page-loading"><span className="spinner"></span></div>;
+  const {articles,stats}=data;
+
+  return(
+    <div className="dash-layout fade-in" dir={lang==='ar'?'rtl':'ltr'}>
+      <div style={{display:'flex',justifyContent:'space-between',flexWrap:'wrap',gap:16,marginBottom:40}}>
+        <div>
+          <div className="dash-title">{t.dashboard}</div>
+          <div className="dash-sub">{t.hello(currentUser?.displayName||'')}</div>
+        </div>
+        <div style={{display:'flex',gap:8}}>
+          <button className="btn btn-ghost btn-sm" onClick={()=>setEditProfile(true)}>{t.profile}</button>
+          <button className="btn btn-primary btn-sm" onClick={()=>navigate('new')}>{t.newArticle}</button>
+        </div>
+      </div>
+
+      <div className="stats-grid">
+        {[{n:stats.published,l:t.published},{n:stats.drafts,l:t.drafts},{n:stats.totalViews.toLocaleString(),l:t.totalViewsStat},{n:stats.total,l:t.totalArticles}].map((s,i)=>(
+          <div key={i} className="stat-card"><div className="stat-number">{s.n}</div><div className="stat-label">{s.l}</div></div>
+        ))}
+      </div>
+
+      <div className="section-header" style={{margin:'0 0 20px'}}>
+        <h2 className="section-title">{t.myArticles}</h2>
+        {currentUser?.username&&<button className="btn btn-outline btn-sm" onClick={()=>navigate('author',currentUser.username)}>{t.myPublicPage}</button>}
+      </div>
+
+      {articles.length===0?(
+        <div className="empty-state">
+          <div className="empty-icon">📝</div>
+          <div className="empty-title">{t.nothingYet}</div>
+          <div className="empty-sub">{t.uploadFirst}</div>
+          <button className="btn btn-primary" onClick={()=>navigate('new')}>{t.newArticle}</button>
+        </div>
+      ):(
+        <div className="articles-table">
+          <div className="table-header">
+            <div>{t.tableTitle}</div><div>{t.tableStatus}</div><div>{t.tableViews}</div><div>{t.tableWords}</div><div>{t.tableActions}</div>
+          </div>
+          {articles.map(a=>(
+            <div key={a.id} className="table-row">
+              <div className="table-title" onClick={()=>a.status==='published'&&navigate('article',a.id)}>{a.title}</div>
+              <div><span className={`status-badge status-${a.status}`}>{a.status==='published'?t.statusPublished:t.statusDraft}</span></div>
+              <div style={{fontSize:14,color:'var(--ink-mid)'}}>{a.views||0}</div>
+              <div style={{fontSize:14,color:'var(--ink-mid)'}}>{a.wordCount||0}</div>
+              <div className="table-actions">
+                <button className="icon-btn" title={a.status==='published'?t.toDraft:t.toPublish} onClick={()=>toggleStatus(a)}>
+                  {a.status==='published'?'🔒':'🚀'}
+                </button>
+                <button className="icon-btn danger" title={t.delete} onClick={()=>deleteArticle(a.id)}>🗑</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {editProfile&&(
+        <div className="modal-overlay" onClick={e=>e.target===e.currentTarget&&setEditProfile(false)}>
+          <div className="modal" dir={lang==='ar'?'rtl':'ltr'}>
+            <div className="modal-header">
+              <span className="modal-title">{t.profileTitle}</span>
+              <button className="modal-close" onClick={()=>setEditProfile(false)}>✕</button>
+            </div>
+            <div className="modal-body">
+              <div className="form-group"><label>{t.fullName}</label><input value={profileForm.displayName} onChange={e=>setProfileForm(f=>({...f,displayName:e.target.value}))}/></div>
+              <div className="form-group"><label>{t.bioLabel}</label><textarea value={profileForm.bio} onChange={e=>setProfileForm(f=>({...f,bio:e.target.value}))} placeholder={t.bioPH}/></div>
+              <div style={{display:'flex',gap:10}}>
+                <button className="btn btn-primary" style={{flex:1,justifyContent:'center'}} onClick={saveProfile}>{t.saveChanges}</button>
+                <button className="btn btn-ghost" onClick={()=>setEditProfile(false)}>{t.cancel}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── App Root ─────────────────────────────────────────────────────────────────
+function App() {
+  const [route,setRoute]=useState({page:'home',id:null});
+  const [user,setUser]=useState(null);
+  const [modal,setModal]=useState(null);
+  const [notif,setNotif]=useState(null);
+  const [lang,setLang]=useState(()=>localStorage.getItem('iw_lang')||'ar');
+
+  // Apply lang/dir to <html>
+  useEffect(()=>{
+    const h=document.documentElement;
+    h.lang=lang; h.dir=lang==='ar'?'rtl':'ltr';
+    document.title=lang==='ar'?'Inkwell · منصة التدوين':'Inkwell · Blogging Platform';
+    localStorage.setItem('iw_lang',lang);
+  },[lang]);
+
+  // Restore session
+  useEffect(()=>{
+    const token=localStorage.getItem('iw_token');
+    if(token){
+      try{
+        const p=JSON.parse(atob(token.split('.')[1]));
+        setUser({id:p.id,username:p.username,displayName:p.username});
+        API.get(`/api/users/${p.username}`).then(d=>{if(d.user)setUser(u=>({...u,displayName:d.user.displayName,bio:d.user.bio}));});
+      }catch{}
+    }
+  },[]);
+
+  function navigate(page,id=null){setRoute({page,id});window.scrollTo(0,0);}
+  function notify(msg,type='success'){setNotif({msg,type,key:Date.now()});}
+  function logout(){localStorage.removeItem('iw_token');setUser(null);navigate('home');notify(T[lang].loggedOut,'success');}
+  function onAuthSuccess(u){setUser(u);setModal(null);notify(T[lang].welcome(u.displayName),'success');}
+  function toggleLang(){setLang(l=>l==='ar'?'en':'ar');}
+
+  const t=T[lang];
+  const {page,id}=route;
+
+  const authGuard=(comp)=>user?comp:(
+    <div className="empty-state fade-in">
+      <div className="empty-icon">🔐</div>
+      <div className="empty-title">{t.mustLogin}</div>
+      <button className="btn btn-primary" onClick={()=>setModal('login')}>{t.login}</button>
+    </div>
+  );
+
+  return(
+    <>
+      <Navbar user={user} onLogin={()=>setModal('login')} onRegister={()=>setModal('register')}
+        onLogout={logout} navigate={navigate} lang={lang} onToggleLang={toggleLang}/>
+      <main>
+        {page==='home'&&<HomePage navigate={navigate} user={user} onLogin={()=>setModal('login')} onRegister={()=>setModal('register')} lang={lang}/>}
+        {page==='article'&&<ArticleReader articleId={id} navigate={navigate} lang={lang}/>}
+        {page==='author'&&<AuthorPage username={id} navigate={navigate} lang={lang}/>}
+        {page==='new'&&authGuard(<NewArticlePage navigate={navigate} notify={notify} lang={lang}/>)}
+        {page==='dashboard'&&authGuard(<DashboardPage navigate={navigate} currentUser={user} notify={notify} lang={lang}/>)}
+      </main>
+      {modal&&<AuthModal mode={modal} onClose={()=>setModal(null)} onSuccess={onAuthSuccess} lang={lang}/>}
+      {notif&&<Notification key={notif.key} msg={notif.msg} type={notif.type} onClose={()=>setNotif(null)}/>}
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
